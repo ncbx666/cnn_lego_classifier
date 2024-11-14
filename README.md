@@ -30,7 +30,35 @@
   - Слой 1: 300 входов → 120 выходов, с активацией `ReLU`.
   - Слой 2: 120 входов → 84 выхода, с активацией `Sigmoid`.
   - Выходной слой: 84 входа → 10 выходов (для предсказания класса).
+```python
+#input 48x48x1
+def create_cnn():
+    model = nn.Sequential(
+        # Первый сверточный слой: Conv2d, ReLU, AvgPool2d
+        nn.Conv2d(in_channels=1, out_channels=6, kernel_size=3),  # out: 46x46x6
+        nn.ReLU(),
+        nn.AvgPool2d(kernel_size=2),  # out: 24x24x6
+        nn.ReLU(),
 
+        # Второй сверточный слой: Conv2d, ReLU
+        nn.Conv2d(in_channels=6, out_channels=3, kernel_size=3),  # out: 21x21x3
+        nn.ReLU(),
+
+        # Второй слой пулинга: MaxPool2d
+        nn.MaxPool2d(kernel_size=2, stride=2),  # out: 10x10x3
+
+        # Растягиваем матрицу
+        nn.Flatten(),
+
+        # Подаем преобразованное изображение на вход FCL
+        nn.Linear(10*10*3, 120),
+        nn.ReLU(),
+        nn.Linear(120, 84),
+        nn.Sigmoid(),
+        nn.Linear(84, 10)
+    )
+    return model
+```
 ## Обучение модели
 
 Модель обучается с использованием стохастического градиентного спуска (SGD) и функции потерь `CrossEntropyLoss`. В процессе обучения отслеживается точность на обучающем наборе данных для каждой эпохи.
