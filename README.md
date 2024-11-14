@@ -105,3 +105,32 @@ def train_model(model, dataloader, device=device, num_epoch=NUM_EPOCH, learning_
 
   return model, acc_history
 ```
+## Оценка модели
+
+После обучения модели оценивается точность на обучающей и тестовой выборках. Это позволяет проверить, насколько хорошо модель обучилась на данных и насколько она обобщается на новые данные.
+### Код для оценки точности
+```python
+def evaluate_model(model, dataloader, device=device):
+    model = model.to(device)
+    model.eval()  # Устанавливаем модель в режим оценки
+
+    correct = 0
+    total = 0
+
+    with torch.no_grad():
+        for images, labels in dataloader:
+            images = images.to(device)
+            labels = labels.to(device)
+
+            predicted_labels = model(images)
+
+            _, predicted = predicted_labels.max(1)  # Выбираем класс с максимальной вероятностью
+
+            # Подсчитываем количество правильных предсказаний
+            total += labels.size(0)
+            correct += predicted.eq(labels).sum().item()
+
+    accuracy = correct / total  # Вычисляем точность
+
+    return accuracy
+```
