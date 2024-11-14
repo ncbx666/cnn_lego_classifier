@@ -136,5 +136,6 @@ def evaluate_model(model, dataloader, device=device):
 ```
 ## Результаты
 **Точность на тестовых данных:** 100% (датасет довольно простой)
+
 Также был построен график зависимости значения точность и эпох
 ![image](https://github.com/user-attachments/assets/767a596e-cb10-4043-9b7e-40028cab305f)
