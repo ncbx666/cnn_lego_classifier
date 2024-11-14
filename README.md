@@ -61,16 +61,47 @@ def create_cnn():
 ```
 ## Обучение модели
 
-Модель обучается с использованием стохастического градиентного спуска (SGD) и функции потерь `CrossEntropyLoss`. В процессе обучения отслеживается точность на обучающем наборе данных для каждой эпохи.
+Модель обучается с использованием стохастического градиентного спуска `SGD` и функции потерь `CrossEntropyLoss`. В процессе обучения отслеживается точность на обучающем наборе данных для каждой эпохи.
 
-### Параметры обучения:
-
-- **Количество эпох (num_epoch)**: количество итераций для обучения модели.
-- **Скорость обучения (learning_rate)**: шаг обновления весов.
-- **Моментум**: используется для стабилизации SGD и ускорения обучения.
-
-### Пример кода для обучения:
-
+### Код функции обучения
 ```python
-model = create_cnn()
-trained_model, acc_history = train_model(model, dataloader, device='cuda', num_epoch=20, learning_rate=0.01)
+def train_model(model, dataloader, device=device, num_epoch=NUM_EPOCH, learning_rate=LEARN_RATE):
+  model = model.to(device)
+
+  loss_function = nn.CrossEntropyLoss()
+  optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+
+  acc_history = []
+
+
+  for epoch in range(num_epoch):
+          correct = 0
+          total = 0
+
+          for i, batch in enumerate(dataloader):
+              images, labels = batch
+              images = images.to(device)
+              labels = labels.to(device)
+
+              optimizer.zero_grad()
+
+              # Считаем лосс
+              predicted_labels = model(images)
+              loss = loss_function(predicted_labels, labels)
+
+              loss.backward()
+
+              # Обновление параметров
+              optimizer.step()
+
+              # Подсчет точности
+              _, predicted = predicted_labels.max(1) # По столбцам выбираем индекс с максимальной верояностью
+              total += labels.size(0)
+              correct += predicted.eq(labels).sum().item()
+
+          # Точность по эпохе
+          acc = correct / total
+          acc_history.append(acc)
+
+  return model, acc_history
+```
